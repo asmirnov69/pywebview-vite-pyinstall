@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client';
 
 const App = () => {
   const [message, setMessage] = useState('Waiting for server message...');
+  const [counter, setCounter] = useState(0);
   const [socket, setSocket] = useState<WebSocket | null>(null);
 
   useEffect(() => {
@@ -19,15 +20,32 @@ const App = () => {
     return () => ws.close();
   }, []);
 
-  const sayHello = () => {
+  useEffect(() => {
+    (window as any).updateCounter = (value: number) => {
+      setCounter(value);
+    };
+  }, []);
+
+  const sayHelloSocket = () => {
     socket?.send('Hello button clicked!');
+  };
+
+  const sayHelloPython = async () => {
+    if ('pywebview' in window) {
+      const response = await (window as any).pywebview.api.say_hello();
+      alert(`Python says: ${response}`);
+    } else {
+      alert('pywebview API is not available');
+    }
   };
 
   return (
     <div>
-      <h1>React + WebSocket Demo</h1>
+      <h1>React + WebSocket + Counter Demo</h1>
       <p>{message}</p>
-      <button onClick={sayHello}>Say Hello</button>
+      <p>Counter: {counter}</p>
+      <button onClick={sayHelloSocket}>Say Hello via WebSocket</button>
+      <button onClick={sayHelloPython}>Say Hello via Python</button>
     </div>
   );
 };
