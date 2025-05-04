@@ -2,7 +2,6 @@ from typing import Any
 import asyncio
 import threading
 import webview
-import websockets
 import os
 import sys
         
@@ -17,8 +16,12 @@ async def push_counter():
         i += 1
 
 class API:
+    def __init__(self):
+        self.c = 0
+        
     def say_hello(self) -> str:
-        return "Hello from Python!"
+        self.c += 1
+        return f"Hello from Python! {self.c}"
 
 def main():
     loop = asyncio.new_event_loop()
