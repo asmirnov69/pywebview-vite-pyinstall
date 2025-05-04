@@ -5,6 +5,20 @@ import webview
 import websockets
 import os
 import sys
+
+async def echo(websocket):
+    async for message in websocket:
+        print("Received:", message)
+        await websocket.send(f"Echo: {message}")
+
+async def start_websocket():
+    async with websockets.serve(echo, "localhost", 8765):
+        await asyncio.Future()
+
+def launch_websocket_server():
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    loop.run_until_complete(start_websocket())
         
 window = None
 async def push_counter():
@@ -21,6 +35,8 @@ class API:
         return "Hello from Python!"
 
 def main():
+    threading.Thread(target=launch_websocket_server, daemon=True).start()
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
 
